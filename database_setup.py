@@ -14,8 +14,8 @@ class User(Base):
     picture = Column(String(250))
     points = Column(Integer)
 
-class Lesson(Base):
-    __tablename__ = 'lesson'
+class Class(Base):
+    __tablename__ = 'class'
    
     id = Column(Integer, primary_key=True)
     user = relationship(User)
@@ -37,5 +37,5 @@ class Lesson(Base):
            'picture'      : self.picture,
        }
 
-engine = create_engine('sqlite:///catalogue.db')
+engine = create_engine('sqlite:///catalog.db')
 Base.metadata.create_all(engine)

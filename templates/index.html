@@ -2,9 +2,26 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <title>Udacity FSND Project 3</title>
+    <title>Class Catalog: All classes</title>
 </head>
 <body>
-{{content}}
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                 <li> <strong> {{ message }} </strong> </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endwith %}
+
+{% if classes %}
+    <ul>
+        {% for class in classes %}
+             <li><b>{{ class.category }}</b> | {{class.title}}: {{ class.description }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<a href="{{url_for('new_class')}}">Add new class</a>
 </body>
 </html>
