@@ -3,13 +3,14 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title>Class Catalog: All classes</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
 <body>
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         <ul>
             {% for message in messages %}
-                 <li> <strong> {{ message }} </strong> </li>
+                 <li class="flash"> {{ message }} </li>
             {% endfor %}
         </ul>
     {% endif %}
@@ -18,10 +19,13 @@
 {% if classes %}
     <ul>
         {% for class in classes %}
-             <li><b>{{ class.category }}</b> | {{class.title}}: {{ class.description }}</li>
+             <li><b>{{ class.category }}</b> | {{class.title}}: {{ class.description }}
+                 <a href="/edit_class/{{class.id}}" class="edit">edit</a>
+                 <a href="/delete_class/{{class.id}}" class="delete">delete</a></li>
         {% endfor %}
     </ul>
 {% endif %}
 <a href="{{url_for('new_class')}}">Add new class</a>
+
 </body>
 </html>

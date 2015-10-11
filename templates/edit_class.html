@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Class Catalog: Edit class.</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
+</head>
+<body>
+    <h2>Edit class</h2>
+    <form action="#" method="post">
+        <label>Category</label>
+        <input type ="text" name="category" value="{{class_to_edit.category}}">
+        <label>Title</label>
+        <input type ="text" name="title" value="{{class_to_edit.title}}">
+        <label>Description:</label>
+        <textarea maxlength="500" rows="3" name="description">{{class_to_edit.description}}</textarea>
+        <button type="submit">Edit</button>
+    </form>
+</body>
+</html>

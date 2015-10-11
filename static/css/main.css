@@ -1,7 +1,13 @@
+li.flash{
+    list-style-type: none;
+    background-color:cyan;
+}
+
 label,input,textarea{
     display:block;
 }
 label,button{
     margin-top:10px;
 }
+
 
