@@ -1,6 +1,6 @@
 import json
 from flask import Flask, render_template, request, redirect, jsonify, \
-    url_for, flash
+    url_for, flash, Response
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Class
@@ -15,7 +15,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
-# VIEWS
+# HTML VIEWS
 
 
 @app.route('/')
@@ -130,6 +130,21 @@ def edit_class(id):
     else:
         flash('Unsupported request type.')
         return redirect(url_for('show_all'))
+
+# JSON VIEWS
+
+@app.route('/JSON/')
+def show_all_JSON():
+    categories = session.query(Category).all()
+    categories_and_classes = {}
+
+    for category in categories:
+        classes = session.query(Class).filter_by(category_id=category.id).all()
+        categories_and_classes[category.title]=[i.serialize for i in classes]
+
+    print categories_and_classes
+    return Response(json.dumps(categories_and_classes, indent=2,
+                               sort_keys=False), mimetype='application/json')
 
 
 # Run flask app at http://localhost:5002/ in debug mode
