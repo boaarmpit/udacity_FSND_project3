@@ -16,12 +16,15 @@
     {% endif %}
 {% endwith %}
 
-{% if classes %}
+{% if data %}
     <ul>
-        {% for class in classes %}
-             <li><b>{{ class.category }}</b> | {{class.title}}: {{ class.description }}
+        {% for category_title, classes in data %}
+        <h2>{{category_title}}</h2>
+            {% for class in classes %}
+             <li><b>{{class.title}}</b>: {{ class.description }}
                  <a href="/edit_class/{{class.id}}" class="edit">edit</a>
                  <a href="/delete_class/{{class.id}}" class="delete">delete</a></li>
+            {% endfor %}
         {% endfor %}
     </ul>
 {% endif %}

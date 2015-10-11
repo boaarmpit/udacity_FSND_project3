@@ -14,16 +14,26 @@ class User(Base):
     picture = Column(String(250))
     points = Column(Integer)
 
+class Category(Base):
+    __tablename__ = 'category'
+
+    id = Column(Integer, primary_key=True)
+    title = Column(String(250), nullable=False)
+
 class Class(Base):
     __tablename__ = 'class'
    
     id = Column(Integer, primary_key=True)
+
     user = relationship(User)
     teacher_id = Column(Integer, ForeignKey('user.id'))
+
+    category = relationship(User)
+    category_id = Column(Integer, ForeignKey('category.id'))
+
     title = Column(String(250), nullable=False)
     description = Column(String(500), nullable=False)
     picture = Column(String(250))
-    category = Column(String(250), nullable=False)
 
     @property
     def serialize(self):
