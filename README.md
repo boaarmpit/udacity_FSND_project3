@@ -9,3 +9,5 @@ Rename *"private_example_files"* folder to *"private"* and edit *secrets.json* a
 
 Change "YOUR_APP_KEY" to a private value of your choosing.
 
+Run *populate_database.py* to add some sample data taken from [MIT OCW](http://ocw.mit.edu/courses/)
+
