@@ -26,6 +26,7 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
 
+# Add a new user to the database
 def create_user(login_session):
     new_user = User(name=login_session['username'],
                     email=login_session['email'],
@@ -36,6 +37,7 @@ def create_user(login_session):
     return user.id
 
 
+# Get a user from their email
 def get_user_id(email):
     try:
         user = session.query(User).filter_by(email=email).one()
@@ -44,6 +46,7 @@ def get_user_id(email):
         return None
 
 
+# Validate anti CSRF token and return error response if it doesn't match
 def validate_token(token):
     if token != login_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
@@ -53,16 +56,6 @@ def validate_token(token):
         return
 
 
-# Test state DEBUGGING ONLY
-@oauth_api.route('/test')
-def test():
-    print "Anti Forgery State Token: ", login_session['state']
-    credentials = OAuth2Credentials.from_json(login_session['credentials'])
-    access_token = credentials.access_token
-    print "Google Access Token:", access_token
-    return ""
-
-
 # Clear session DEBUGGING ONLY
 @oauth_api.route('/clear_session')
 def clear_session():
@@ -70,8 +63,7 @@ def clear_session():
     return "Session cleared"
 
 
-# Create a state token to prevent request forgery.
-# Store it in the session for later validation.
+# Create a state token to prevent request forgery and return login page
 @oauth_api.route('/login')
 def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
@@ -80,6 +72,7 @@ def login():
     return render_template('login.html', STATE=state)
 
 
+# Connect using google as an oauth provider
 @oauth_api.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token (Anti Forgery State Token)
@@ -176,7 +169,8 @@ def gconnect():
     return output
 
 
-# DISCONNECT - Revoke a current user's token and reset their login session.
+# Revoke a current user's token and reset their login session.
+# (when using google as an oauth provider)
 def gdisconnect():
     # Only disconnect a connected user.
     try:
@@ -217,6 +211,7 @@ def gdisconnect():
         return response
 
 
+# Connect using facebook as an oauth provider
 @oauth_api.route('/fbconnect', methods=['POST'])
 def fbconnect():
     # Validate state token (Anti Forgery State Token)
@@ -291,6 +286,8 @@ def fbconnect():
     return output
 
 
+# Revoke a current user's token and reset their login session.
+# (when using facebook as an oauth provider)
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
@@ -310,6 +307,7 @@ def fbdisconnect():
     return "you have been logged out (from facebook oauth)"
 
 
+# Disconnect from connected oauth provider (google or facebook)
 @oauth_api.route('/disconnect')
 def disconnect():
     # Validate state token (Anti Forgery State Token)

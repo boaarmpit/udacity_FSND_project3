@@ -35,16 +35,8 @@ def allowed_file(filename):
 
 # HTML VIEWS
 
-# Temporary test function for debugging oauth state.
-@app.route('/test/')
-def test():
-    app_oauth.login_session['state'] = 'unusable'
-    if 'provider' in app_oauth.login_session:
-        return app_oauth.login_session['provider']
-    else:
-        return "no provider variable found"
-
-
+# Displays all classes sorted by subject,
+# with links to edit/delete if user is logged in
 @app.route('/')
 def show_all():
     logged_in = 'username' in app_oauth.login_session
@@ -67,6 +59,8 @@ def show_all():
                                UPLOAD_FOLDER=UPLOAD_FOLDER)
 
 
+# GET method: Form for registered user to add a new class
+# POST method: Accepts submitted data and saves to database
 @app.route('/new_class/', methods=['GET', 'POST'])
 def new_class():
     if 'user_id' not in app_oauth.login_session:
@@ -121,6 +115,9 @@ def new_class():
         return redirect(url_for('show_all'))
 
 
+# GET method: Form to confirm registered wants to delete class
+# POST method: Deletes selected class
+# and also category if it no longer contains any classes
 @app.route('/delete_class/<int:id>/', methods=['GET', 'POST'])
 def delete_class(id):
     if 'user_id' not in app_oauth.login_session:
@@ -169,6 +166,8 @@ def delete_class(id):
         return redirect(url_for('show_all'))
 
 
+# GET method: Form for registered user to edit a class (that they added)
+# POST method: Accepts submitted data and saves to database
 @app.route('/edit_class/<int:id>/', methods=['GET', 'POST'])
 def edit_class(id):
     if 'user_id' not in app_oauth.login_session:
@@ -245,7 +244,6 @@ def edit_class(id):
 
 
 # JSON Endpoint(s)
-
 @app.route('/JSON/')
 def show_all_json():
     categories = session.query(Category).all()
