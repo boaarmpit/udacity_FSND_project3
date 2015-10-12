@@ -7,14 +7,16 @@
 </head>
 <body>
     <h2>Add a new class</h2>
-    <form action="#" method="post">
+    <form action="#" method="post" enctype="multipart/form-data">
         <label>Category</label>
         <input type ="text" name="category" value="Category. e.g. 'Science'">
         <label>Title</label>
         <input type ="text" name="title" value="Title of the class">
         <label>Description:</label>
         <textarea maxlength="500" rows="3" name="description">Description of the class. This should be detailed and can be up to 500 characters in length.</textarea>
-        <button type="submit">Add</button>
+        <label>Image (optional):</label>
+        <input type="file" name="file" value="Select Image">
+        <button type="submit">Submit</button>
     </form>
 </body>
 </html>

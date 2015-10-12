@@ -3,41 +3,44 @@ body{
     color: #AAA;
     font-family: helvetica;
 }
-
 h2{
     color:#FFF;
 }
-
 b{
     color:#FFF;
 }
-
 a.add, a.login{
     color:#9E9;
 }
-
 a.edit{
     color:#EE9;
 }
-
 a.delete, a.logout{
     color:#E99;
 }
-
-
-
-
 li.flash{
     list-style-type: none;
     background-color:cyan;
     color:black;
 }
-
 label,input,textarea{
     display:block;
 }
-label,button{
+label{
     margin-top:10px;
 }
+button{
+    margin-top:30px;
+}
 
+img.small_thumb{
+    display:inline;
+    width:25px;
+}
+
+img.med_thumb{
+    display:block;
+    width:180px;
+    padding-bottom:10px;
+}
 

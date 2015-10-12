@@ -27,7 +27,11 @@
         {% for category_title, classes in data %}
         <h2>{{category_title}}</h2>
             {% for class in classes %}
-             <li><b>{{class.title}}</b>: {{ class.description }}
+             <li><b>{{class.title}}</b>
+                 {% if class.picture != None %}
+                 <a href ="{{UPLOAD_FOLDER}}{{class.picture}}"><img src="{{UPLOAD_FOLDER}}{{class.picture}}" class="small_thumb"></a>
+                 {% endif %}
+                 : {{ class.description }}
                  {% if logged_in==True %}
                  <a href="/edit_class/{{class.id}}?state={{state}}" class="edit">edit</a>
                  <a href="/delete_class/{{class.id}}?state={{state}}" class="delete">delete</a>

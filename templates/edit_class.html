@@ -7,14 +7,19 @@
 </head>
 <body>
     <h2>Edit class</h2>
-    <form action="#" method="post">
+    <form action="#" method="post" enctype="multipart/form-data">
         <label>Category</label>
         <input type ="text" name="category_title" value="{{category_title}}">
         <label>Title</label>
         <input type ="text" name="title" value="{{class_to_edit.title}}">
         <label>Description:</label>
         <textarea maxlength="500" rows="3" name="description">{{class_to_edit.description}}</textarea>
-        <button type="submit">Edit</button>
+        <label>Image (optional):</label>
+        {% if class_to_edit.picture %}
+        <img src="../../{{UPLOAD_FOLDER}}{{class_to_edit.picture}}" class="med_thumb">
+        {% endif %}
+        <input type="file" name="file" value="Select Image">
+        <button type="submit">Submit</button>
     </form>
 </body>
 </html>
