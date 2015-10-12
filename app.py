@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Class
 from flask import session as login_session
+from lxml import etree as ET
 
 # Setup flask app
 app = Flask(__name__)
@@ -131,7 +132,7 @@ def edit_class(id):
         flash('Unsupported request type.')
         return redirect(url_for('show_all'))
 
-# JSON VIEWS
+# JSON Endpoint(s)
 
 @app.route('/JSON/')
 def show_all_JSON():
@@ -140,11 +141,35 @@ def show_all_JSON():
 
     for category in categories:
         classes = session.query(Class).filter_by(category_id=category.id).all()
-        categories_and_classes[category.title]=[i.serialize for i in classes]
+        categories_and_classes[category.title] = [i.serialize for i in classes]
 
     print categories_and_classes
     return Response(json.dumps(categories_and_classes, indent=2,
                                sort_keys=False), mimetype='application/json')
+
+
+# XML Endpoint(s)
+@app.route('/XML/')
+def show_all_xml():
+    categories = session.query(Category).all()
+
+    xml_root = ET.Element("root")
+
+    for category in categories:
+        xml_category = ET.SubElement(xml_root, "category", id=str(category.id))
+        ET.SubElement(xml_category, "title").text = category.title
+        xml_category_classes = ET.SubElement(xml_category, "classes")
+        classes = session.query(Class).filter_by(category_id=category.id).all()
+        for c in classes:
+            xml_class = ET.SubElement(xml_category_classes, "class",
+                                      id=str(c.id))
+            ET.SubElement(xml_class, "title").text = c.title
+            ET.SubElement(xml_class, "description").text = c.description
+
+    xml_out = ET.tostring(xml_root, pretty_print=True, xml_declaration=True,
+                          encoding='UTF-8')
+    print xml_out
+    return Response(xml_out, mimetype='application/xml')
 
 
 # Run flask app at http://localhost:5002/ in debug mode
