@@ -267,14 +267,16 @@ def show_all_xml():
             xml_class = et.SubElement(xml_category_classes, "class",
                                       id=str(c.id))
             et.SubElement(xml_class, "title").text = c.title
+            et.SubElement(xml_class, "teacher_id").text = str(c.teacher_id)
             et.SubElement(xml_class, "description").text = c.description
+            et.SubElement(xml_class, "picture").text = c.picture
 
     xml_out = et.tostring(xml_root, method='xml', encoding='UTF-8')
     return Response(xml_out, mimetype='application/xml')
 
-# Run flask app at http://localhost:5002/ in debug mode
+# Run flask app at http://localhost:5000/
 if __name__ == '__main__':
     app.secret_key = json.loads(
         open('private/secrets.json', 'r').read())['app']['secret_key']
-    app.debug = True
+    app.debug = False
     app.run(host='localhost', port=5000)

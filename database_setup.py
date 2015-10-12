@@ -44,10 +44,10 @@ class Class(Base):
         """Return object data in easily serializeable format"""
         return OrderedDict([
             ('id', self.id),
-            # ('teacher_id'   , self.teacher_id),
             ('title', self.title),
+            ('teacher_id'   , self.teacher_id),
             ('description', self.description),
-            # ('picture'      , self.picture)
+            ('picture'      , self.picture)
         ])
 
 
