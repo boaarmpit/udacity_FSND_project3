@@ -14,7 +14,6 @@ oauth_api = Blueprint('oauth_api', __name__)
 CLIENT_ID = json.loads(
     open('private/google_client_secret.json', 'r').read())['web']['client_id']
 
-
 # Connect to Database and create database session
 engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
@@ -42,6 +41,13 @@ def getUserID(email):
     except:
         return None
 
+def validate_token(token):
+    if token != login_session['state']:
+            response = make_response(json.dumps('Invalid state parameter.'), 401)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    else:
+        return
 
 # Test state DEBUGGING ONLY
 @oauth_api.route('/test')
@@ -71,10 +77,10 @@ def login():
 @oauth_api.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token (Anti Forgery State Token)
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    invalid_response = validate_token(request.args.get('state'))
+    if invalid_response:
+        return invalid_response
+
     # Obtain authorization code
     code = request.data
 
@@ -163,9 +169,8 @@ def gconnect():
 
 
 # DISCONNECT - Revoke a current user's token and reset their login session.
-# @oauth_api.route('/gdisconnect')
 def gdisconnect():
-    # Only disconnect a connected user.
+     # Only disconnect a connected user.
     try:
         credentials = OAuth2Credentials.from_json(login_session['credentials'])
     except:
@@ -204,10 +209,11 @@ def gdisconnect():
 
 @oauth_api.route('/fbconnect', methods=['POST'])
 def fbconnect():
-    if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
-        response.headers['Content-Type'] = 'application/json'
-        return response
+    # Validate state token (Anti Forgery State Token)
+    invalid_response = validate_token(request.args.get('state'))
+    if invalid_response:
+        return invalid_response
+
     access_token = request.data
     print "access token received %s " % access_token
 
@@ -268,7 +274,6 @@ def fbconnect():
     return output
 
 
-# @oauth_api.route('/fbdisconnect')
 def fbdisconnect():
     facebook_id = login_session['facebook_id']
     # The access token must me included to successfully logout
@@ -289,6 +294,11 @@ def fbdisconnect():
 
 @oauth_api.route('/disconnect')
 def disconnect():
+    # Validate state token (Anti Forgery State Token)
+    invalid_response = validate_token(request.args.get('state'))
+    if invalid_response:
+        return invalid_response
+
     if 'provider' in login_session:
         if login_session['provider']=='google':
             gdisconnect()

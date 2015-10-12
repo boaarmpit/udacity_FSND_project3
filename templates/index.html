@@ -17,7 +17,7 @@
 {% endwith %}
 
 {% if logged_in==True %}
-   <a href="{{url_for('oauth_api.disconnect')}}" class ="logout">logout</a>
+   <a href="{{url_for('oauth_api.disconnect')}}?state={{state}}" class ="logout">logout</a>
 {% else %}
    <a href="{{url_for('oauth_api.login')}}" class ="login">login</a>
 {% endif %}
@@ -28,13 +28,16 @@
         <h2>{{category_title}}</h2>
             {% for class in classes %}
              <li><b>{{class.title}}</b>: {{ class.description }}
-                 <a href="/edit_class/{{class.id}}" class="edit">edit</a>
-                 <a href="/delete_class/{{class.id}}" class="delete">delete</a></li>
+                 {% if logged_in==True %}
+                 <a href="/edit_class/{{class.id}}?state={{state}}" class="edit">edit</a>
+                 <a href="/delete_class/{{class.id}}?state={{state}}" class="delete">delete</a>
+                 {% endif %}
+             </li>
             {% endfor %}
         {% endfor %}
     </ul>
 {% endif %}
-<a href="{{url_for('new_class')}}" class="add">Add new class</a>
+<a href="{{url_for('new_class')}}?state={{state}}" class="add">Add new class</a>
 
 </body>
 </html>

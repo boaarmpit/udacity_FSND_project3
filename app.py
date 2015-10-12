@@ -22,6 +22,7 @@ session = DBSession()
 # Temporary test function for debugging oauth state.
 @app.route('/test/')
 def test():
+    app_oauth.login_session['state'] = 'unusable'
     if 'providor'in app_oauth.login_session:
         return app_oauth.login_session['provider']
     else:
@@ -38,8 +39,13 @@ def show_all():
         classes = session.query(Class).filter_by(category_id=category.id).all()
         categories_and_classes.append([category.title, classes])
 
-    return render_template('index.html', data=categories_and_classes,
-                           logged_in=logged_in)
+    if logged_in:
+        return render_template('index.html', data=categories_and_classes,
+                               logged_in=True,
+                               state=app_oauth.login_session['state'])
+    else:
+        return render_template('index.html', data=categories_and_classes,
+                               logged_in=False)
 
 
 @app.route('/new_class/', methods=['GET', 'POST'])
@@ -47,6 +53,12 @@ def new_class():
     if 'user_id' not in app_oauth.login_session:
         return redirect(url_for('oauth_api.login'))
     user_id = app_oauth.login_session['user_id']
+
+    # Validate state token (Anti Forgery State Token)
+    invalid_response = app_oauth.validate_token(request.args.get('state'))
+    if invalid_response:
+        return invalid_response
+
     if request.method == 'GET':
         return render_template('new_class.html', content='add new class')
     if request.method == 'POST':
@@ -83,8 +95,13 @@ def new_class():
 def delete_class(id):
     if 'user_id' not in app_oauth.login_session:
         return redirect(url_for('oauth_api.login'))
-
     user_id = app_oauth.login_session['user_id']
+
+    # Validate state token (Anti Forgery State Token)
+    invalid_response = app_oauth.validate_token(request.args.get('state'))
+    if invalid_response:
+        return invalid_response
+
     class_to_delete = session.query(Class).filter_by(id=id).one()
     if class_to_delete.teacher_id != user_id:
         flash(u'Unauthorized to delete item')
@@ -120,8 +137,13 @@ def delete_class(id):
 def edit_class(id):
     if 'user_id' not in app_oauth.login_session:
         return redirect(url_for('oauth_api.login'))
-
     user_id = app_oauth.login_session['user_id']
+
+    # Validate state token (Anti Forgery State Token)
+    invalid_response = app_oauth.validate_token(request.args.get('state'))
+    if invalid_response:
+        return invalid_response
+
     class_to_edit = session.query(Class).filter_by(id=id).one()
     if class_to_edit.teacher_id != user_id:
         flash(u'Unauthorized to edit item')
