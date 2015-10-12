@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Class
 from flask import session as login_session
-from lxml import etree as et
+import xml.etree.ElementTree as et
 
 # Setup flask app
 app = Flask(__name__)
@@ -173,8 +173,7 @@ def show_all_xml():
             et.SubElement(xml_class, "title").text = c.title
             et.SubElement(xml_class, "description").text = c.description
 
-    xml_out = et.tostring(xml_root, pretty_print=True, xml_declaration=True,
-                          encoding='UTF-8')
+    xml_out = et.tostring(xml_root, method='xml', encoding='UTF-8')
     return Response(xml_out, mimetype='application/xml')
 
 # Run flask app at http://localhost:5002/ in debug mode
