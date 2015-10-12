@@ -1,4 +1,5 @@
-import json, os
+import json
+import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, \
     url_for, flash, Response
@@ -7,15 +8,16 @@ from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Class
 import xml.etree.ElementTree as et
 
+import app_oauth
+
 # Setup flask app
 UPLOAD_FOLDER = 'static/images/upload/'
-ALLOWED_EXTENSIONS = set(['jpg', 'jpeg','png'])
+ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 
 app = Flask(__name__)
 app.debug = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-import app_oauth
 app.register_blueprint(app_oauth.oauth_api, url_prefix='/oauth')
 
 # Connect to Database and create database session
@@ -23,6 +25,7 @@ engine = create_engine('sqlite:///catalog.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
 
 # Function to check if file extension is allowed
 def allowed_file(filename):
@@ -36,10 +39,11 @@ def allowed_file(filename):
 @app.route('/test/')
 def test():
     app_oauth.login_session['state'] = 'unusable'
-    if 'providor'in app_oauth.login_session:
+    if 'provider' in app_oauth.login_session:
         return app_oauth.login_session['provider']
     else:
-        return "no providor variable found"
+        return "no provider variable found"
+
 
 @app.route('/')
 def show_all():
@@ -61,6 +65,7 @@ def show_all():
         return render_template('index.html', data=categories_and_classes,
                                logged_in=False,
                                UPLOAD_FOLDER=UPLOAD_FOLDER)
+
 
 @app.route('/new_class/', methods=['GET', 'POST'])
 def new_class():
@@ -96,7 +101,8 @@ def new_class():
             if not category:
                 category = Category(title=category_title)
                 session.add(category)
-                session.flush()  # so that category.id returns value before commit
+                # flush so that category.id returns value before commit:
+                session.flush()
 
             # Add class
             class_to_add = Class(category_id=category.id,
@@ -138,7 +144,7 @@ def delete_class(id):
     if request.method == 'POST':
         # Delete image if it exists
         if class_to_delete.picture:
-            path = UPLOAD_FOLDER+class_to_delete.picture
+            path = UPLOAD_FOLDER + class_to_delete.picture
             os.remove(path)
             print "deleted", path
 
@@ -198,7 +204,8 @@ def edit_class(id):
             if not category:
                 category = Category(title=category_title)
                 session.add(category)
-                session.flush()  # so that category.id returns value before commit
+                # flush so that category.id returns value before commit:
+                session.flush()
 
             # Save new image if it exists and delete old image if it exists
             file = request.files['file']
@@ -208,7 +215,7 @@ def edit_class(id):
                 file.save(filepath)
                 print "saved to", filepath
                 if class_to_edit.picture:
-                    old_picture_path = UPLOAD_FOLDER+class_to_edit.picture
+                    old_picture_path = UPLOAD_FOLDER + class_to_edit.picture
                     os.remove(old_picture_path)
                     print "deleted", old_picture_path
                 class_to_edit.picture = filename

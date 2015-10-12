@@ -2,11 +2,11 @@
 *"An application that provides a list of items within a variety of categories as well as providing a user registration and authentication system."*  
 This application lists university classes categorized by subject, and enables teachers to log in and add/edit/delete classes.  
 
-###Features:  
+###Features  
 
 - Can list all university classes sorted by subject
 - Registered users can add classes and edit/delete their own classes  
-  (using Facebook and Gmail as Oauth providors)
+  (using Facebook and Gmail as Oauth providers)
 - Support for addition/editing/deletion of class images
 - JSON and XML endpoints
 - Anti CSRF tokens

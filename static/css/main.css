@@ -3,8 +3,37 @@ body{
     color: #AAA;
     font-family: helvetica;
 }
-h2{
+div#main{
+    padding:20px;
+    width: 600px;
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+ul{
+    padding-left:0px;
+}
+ul ul{
+    padding-left:30px;
+}
+li{
+    list-style-type:none;
+}
+li.title{
+    padding-bottom:15px;
+    padding-top:15px;
+}
+li.class{
+    padding-bottom:5px;
+    padding-top:5px;
+}
+span.title, h2{
     color:#FFF;
+    font-size: 30px;
 }
 b{
     color:#FFF;
@@ -44,3 +73,6 @@ img.med_thumb{
     padding-bottom:10px;
 }
 
+input, textarea{
+    width:600px
+}

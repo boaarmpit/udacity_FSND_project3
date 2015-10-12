@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
 <body>
+<div id="main">
 {% with messages = get_flashed_messages() %}
     {% if messages %}
         <ul>
@@ -25,9 +26,11 @@
 {% if data %}
     <ul>
         {% for category_title, classes in data %}
-        <h2>{{category_title}}</h2>
+        <li class="title">
+            <span class="title">{{category_title}}</span>
+            <ul>
             {% for class in classes %}
-             <li><b>{{class.title}}</b>
+             <li class="class"><b>{{class.title}}</b>
                  {% if class.picture != None %}
                  <a href ="{{UPLOAD_FOLDER}}{{class.picture}}"><img src="{{UPLOAD_FOLDER}}{{class.picture}}" class="small_thumb"></a>
                  {% endif %}
@@ -38,10 +41,12 @@
                  {% endif %}
              </li>
             {% endfor %}
+            </ul>
+        </li>
         {% endfor %}
     </ul>
 {% endif %}
 <a href="{{url_for('new_class')}}?state={{state}}" class="add">Add new class</a>
-
+</div>
 </body>
 </html>
