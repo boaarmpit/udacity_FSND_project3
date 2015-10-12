@@ -5,7 +5,7 @@ from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Class
 from flask import session as login_session
-from lxml import etree as ET
+from lxml import etree as et
 
 # Setup flask app
 app = Flask(__name__)
@@ -42,11 +42,12 @@ def new_class():
         if category_title != '' and title != '' and description != '':
 
             # Add category if it doesn't already exist:
-            category = session.query(Category).filter_by(title=category_title).first()
+            category = session.query(Category).filter_by(
+                title=category_title).first()
             if not category:
                 category = Category(title=category_title)
                 session.add(category)
-                session.flush() # so that category.id returns value before commit
+                session.flush()  # so that category.id returns value before commit
 
             # Add class
             class_to_add = Class(category_id=category.id,
@@ -62,6 +63,7 @@ def new_class():
         flash('Unsupported request type.')
         return redirect(url_for('show_all'))
 
+
 @app.route('/delete_class/<int:id>/', methods=['GET', 'POST'])
 def delete_class(id):
     if request.method == 'GET':
@@ -75,14 +77,16 @@ def delete_class(id):
         session.delete(class_to_delete)
 
         # Delete category if there are no longer any classes in it:
-        if session.query(Class).filter_by(category_id=deleted_class_category_id).first() == None:
-            category_to_delete = session.query(Category).filter_by(id=deleted_class_category_id).one()
+        if session.query(Class).filter_by(
+                category_id=deleted_class_category_id).first() is None:
+            category_to_delete = session.query(Category).filter_by(
+                id=deleted_class_category_id).one()
             session.delete(category_to_delete)
             print 'deleted category {0}'.format(category_to_delete.title)
 
         session.commit()
 
-        flash ('Deleted {0} successfully'.format(class_to_delete.title))
+        flash('Deleted {0} successfully'.format(class_to_delete.title))
         return redirect(url_for('show_all'))
     else:
         flash('Unsupported request type.')
@@ -93,10 +97,11 @@ def delete_class(id):
 def edit_class(id):
     if request.method == 'GET':
         class_to_edit = session.query(Class).filter_by(id=id).one()
-        category = session.query(Category).filter_by(id=class_to_edit.category_id).one()
+        category = session.query(Category).filter_by(
+            id=class_to_edit.category_id).one()
         return render_template('edit_class.html',
                                class_to_edit=class_to_edit,
-                               category_title = category.title)
+                               category_title=category.title)
     if request.method == 'POST':
         category_title = request.form['category_title']
         title = request.form['title']
@@ -104,11 +109,12 @@ def edit_class(id):
         if category_title != '' and title != '' and description != '':
 
             # Add category if it doesn't already exist:
-            category = session.query(Category).filter_by(title=category_title).first()
+            category = session.query(Category).filter_by(
+                title=category_title).first()
             if not category:
                 category = Category(title=category_title)
                 session.add(category)
-                session.flush() # so that category.id returns value before commit
+                session.flush()  # so that category.id returns value before commit
 
             # Edit class:
             class_to_edit = session.query(Class).filter_by(id=id).one()
@@ -118,13 +124,15 @@ def edit_class(id):
             class_to_edit.description = description
 
             # Delete category if there are no longer any classes in it:
-            if session.query(Class).filter_by(category_id=edited_class_old_category_id).first() == None:
-                category_to_delete = session.query(Category).filter_by(id=edited_class_old_category_id).one()
+            if session.query(Class).filter_by(
+                    category_id=edited_class_old_category_id).first() is None:
+                category_to_delete = session.query(Category).filter_by(
+                    id=edited_class_old_category_id).one()
                 session.delete(category_to_delete)
                 print 'deleted category {0}'.format(category_to_delete.title)
 
             session.commit()
-            flash ('Edited {0} successfully'.format(class_to_edit.title))
+            flash('Edited {0} successfully'.format(class_to_edit.title))
         else:
             flash('Class category, title, and description required')
         return redirect(url_for('show_all'))
@@ -132,10 +140,11 @@ def edit_class(id):
         flash('Unsupported request type.')
         return redirect(url_for('show_all'))
 
+
 # JSON Endpoint(s)
 
 @app.route('/JSON/')
-def show_all_JSON():
+def show_all_json():
     categories = session.query(Category).all()
     categories_and_classes = {}
 
@@ -143,7 +152,6 @@ def show_all_JSON():
         classes = session.query(Class).filter_by(category_id=category.id).all()
         categories_and_classes[category.title] = [i.serialize for i in classes]
 
-    print categories_and_classes
     return Response(json.dumps(categories_and_classes, indent=2,
                                sort_keys=False), mimetype='application/json')
 
@@ -152,25 +160,22 @@ def show_all_JSON():
 @app.route('/XML/')
 def show_all_xml():
     categories = session.query(Category).all()
-
-    xml_root = ET.Element("root")
+    xml_root = et.Element("root")
 
     for category in categories:
-        xml_category = ET.SubElement(xml_root, "category", id=str(category.id))
-        ET.SubElement(xml_category, "title").text = category.title
-        xml_category_classes = ET.SubElement(xml_category, "classes")
+        xml_category = et.SubElement(xml_root, "category", id=str(category.id))
+        et.SubElement(xml_category, "title").text = category.title
+        xml_category_classes = et.SubElement(xml_category, "classes")
         classes = session.query(Class).filter_by(category_id=category.id).all()
         for c in classes:
-            xml_class = ET.SubElement(xml_category_classes, "class",
+            xml_class = et.SubElement(xml_category_classes, "class",
                                       id=str(c.id))
-            ET.SubElement(xml_class, "title").text = c.title
-            ET.SubElement(xml_class, "description").text = c.description
+            et.SubElement(xml_class, "title").text = c.title
+            et.SubElement(xml_class, "description").text = c.description
 
-    xml_out = ET.tostring(xml_root, pretty_print=True, xml_declaration=True,
+    xml_out = et.tostring(xml_root, pretty_print=True, xml_declaration=True,
                           encoding='UTF-8')
-    print xml_out
     return Response(xml_out, mimetype='application/xml')
-
 
 # Run flask app at http://localhost:5002/ in debug mode
 if __name__ == '__main__':

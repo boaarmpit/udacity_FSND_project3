@@ -3,8 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from collections import OrderedDict
- 
+
 Base = declarative_base()
+
 
 class User(Base):
     __tablename__ = 'user'
@@ -15,15 +16,17 @@ class User(Base):
     picture = Column(String(250))
     points = Column(Integer)
 
+
 class Category(Base):
     __tablename__ = 'category'
 
     id = Column(Integer, primary_key=True)
     title = Column(String(250), nullable=False)
 
+
 class Class(Base):
     __tablename__ = 'class'
-   
+
     id = Column(Integer, primary_key=True)
 
     user = relationship(User)
@@ -40,12 +43,13 @@ class Class(Base):
     def serialize(self):
         """Return object data in easily serializeable format"""
         return OrderedDict([
-            ('id'           , self.id),
+            ('id', self.id),
             # ('teacher_id'   , self.teacher_id),
-            ('title'        , self.title),
-            ('description'  , self.description),
+            ('title', self.title),
+            ('description', self.description),
             # ('picture'      , self.picture)
         ])
+
 
 engine = create_engine('sqlite:///catalog.db')
 Base.metadata.create_all(engine)
