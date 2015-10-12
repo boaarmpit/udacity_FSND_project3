@@ -55,12 +55,12 @@ def new_class():
                                  description=description)
             session.add(class_to_add)
             session.commit()
-            flash('Added class {0} successfully'.format(title))
+            flash(u'Added class {0} successfully'.format(title))
         else:
-            flash('Class category, title, and description required')
+            flash(u'Class category, title, and description required')
         return redirect(url_for('show_all'))
     else:
-        flash('Unsupported request type.')
+        flash(u'Unsupported request type.')
         return redirect(url_for('show_all'))
 
 
@@ -82,14 +82,14 @@ def delete_class(id):
             category_to_delete = session.query(Category).filter_by(
                 id=deleted_class_category_id).one()
             session.delete(category_to_delete)
-            print 'deleted category {0}'.format(category_to_delete.title)
+            print 'deleted category no. {0}'.format(category_to_delete.id)
 
         session.commit()
 
-        flash('Deleted {0} successfully'.format(class_to_delete.title))
+        flash(u'Deleted {0} successfully'.format(class_to_delete.title))
         return redirect(url_for('show_all'))
     else:
-        flash('Unsupported request type.')
+        flash(u'Unsupported request type.')
         return redirect(url_for('show_all'))
 
 
@@ -129,15 +129,15 @@ def edit_class(id):
                 category_to_delete = session.query(Category).filter_by(
                     id=edited_class_old_category_id).one()
                 session.delete(category_to_delete)
-                print 'deleted category {0}'.format(category_to_delete.title)
+                print 'deleted category no. {0}'.format(category_to_delete.id)
 
             session.commit()
-            flash('Edited {0} successfully'.format(class_to_edit.title))
+            flash(u'Edited {0} successfully'.format(class_to_edit.title))
         else:
-            flash('Class category, title, and description required')
+            flash(u'Class category, title, and description required')
         return redirect(url_for('show_all'))
     else:
-        flash('Unsupported request type.')
+        flash(u'Unsupported request type.')
         return redirect(url_for('show_all'))
 
 
