@@ -19,7 +19,7 @@
 {% if logged_in==True %}
    <a href="{{url_for('oauth_api.disconnect')}}" class ="logout">logout</a>
 {% else %}
-   <a href="{{url_for('oauth_api.showLogin')}}" class ="login">login</a>
+   <a href="{{url_for('oauth_api.login')}}" class ="login">login</a>
 {% endif %}
 
 {% if data %}

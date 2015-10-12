@@ -62,7 +62,7 @@ def clearSession():
 # Create a state token to prevent request forgery.
 # Store it in the sessin for later validation.
 @oauth_api.route('/login')
-def showLogin():
+def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state

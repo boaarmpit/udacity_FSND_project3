@@ -44,6 +44,9 @@ def show_all():
 
 @app.route('/new_class/', methods=['GET', 'POST'])
 def new_class():
+    if 'user_id' not in app_oauth.login_session:
+        return redirect(url_for('oauth_api.login'))
+    user_id = app_oauth.login_session['user_id']
     if request.method == 'GET':
         return render_template('new_class.html', content='add new class')
     if request.method == 'POST':
@@ -63,7 +66,8 @@ def new_class():
             # Add class
             class_to_add = Class(category_id=category.id,
                                  title=title,
-                                 description=description)
+                                 description=description,
+                                 teacher_id=user_id)
             session.add(class_to_add)
             session.commit()
             flash(u'Added class {0} successfully'.format(title))
@@ -77,13 +81,21 @@ def new_class():
 
 @app.route('/delete_class/<int:id>/', methods=['GET', 'POST'])
 def delete_class(id):
+    if 'user_id' not in app_oauth.login_session:
+        return redirect(url_for('oauth_api.login'))
+
+    user_id = app_oauth.login_session['user_id']
+    class_to_delete = session.query(Class).filter_by(id=id).one()
+    if class_to_delete.teacher_id != user_id:
+        flash(u'Unauthorized to delete item')
+        return redirect(url_for('show_all'))
+
     if request.method == 'GET':
-        class_to_delete = session.query(Class).filter_by(id=id).one()
         return render_template('delete_class.html',
                                class_to_delete=class_to_delete)
+
     if request.method == 'POST':
         # Delete class:
-        class_to_delete = session.query(Class).filter_by(id=id).one()
         deleted_class_category_id = class_to_delete.category_id
         session.delete(class_to_delete)
 
@@ -106,8 +118,16 @@ def delete_class(id):
 
 @app.route('/edit_class/<int:id>/', methods=['GET', 'POST'])
 def edit_class(id):
+    if 'user_id' not in app_oauth.login_session:
+        return redirect(url_for('oauth_api.login'))
+
+    user_id = app_oauth.login_session['user_id']
+    class_to_edit = session.query(Class).filter_by(id=id).one()
+    if class_to_edit.teacher_id != user_id:
+        flash(u'Unauthorized to edit item')
+        return redirect(url_for('show_all'))
+
     if request.method == 'GET':
-        class_to_edit = session.query(Class).filter_by(id=id).one()
         category = session.query(Category).filter_by(
             id=class_to_edit.category_id).one()
         return render_template('edit_class.html',
@@ -128,7 +148,6 @@ def edit_class(id):
                 session.flush()  # so that category.id returns value before commit
 
             # Edit class:
-            class_to_edit = session.query(Class).filter_by(id=id).one()
             edited_class_old_category_id = class_to_edit.category_id
             class_to_edit.category_id = category.id
             class_to_edit.title = title
