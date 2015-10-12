@@ -1,14 +1,15 @@
 import json
-from flask import Flask, render_template, request, redirect, jsonify, \
+from flask import Flask, render_template, request, redirect, \
     url_for, flash, Response
-from sqlalchemy import create_engine, asc
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, User, Category, Class
-from flask import session as login_session
 import xml.etree.ElementTree as et
 
 # Setup flask app
 app = Flask(__name__)
+import app_oauth
+app.register_blueprint(app_oauth.oauth_api, url_prefix='/oauth')
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///catalog.db')
@@ -18,9 +19,18 @@ session = DBSession()
 
 # HTML VIEWS
 
+# Temporary test function for debugging oauth state.
+@app.route('/test/')
+def test():
+    if 'providor'in app_oauth.login_session:
+        return app_oauth.login_session['provider']
+    else:
+        return "no providor variable found"
 
 @app.route('/')
 def show_all():
+    logged_in = 'username' in app_oauth.login_session
+
     categories = session.query(Category).all()
     categories_and_classes = []
 
@@ -28,7 +38,8 @@ def show_all():
         classes = session.query(Class).filter_by(category_id=category.id).all()
         categories_and_classes.append([category.title, classes])
 
-    return render_template('index.html', data=categories_and_classes)
+    return render_template('index.html', data=categories_and_classes,
+                           logged_in=logged_in)
 
 
 @app.route('/new_class/', methods=['GET', 'POST'])
@@ -181,4 +192,4 @@ if __name__ == '__main__':
     app.secret_key = json.loads(
         open('private/secrets.json', 'r').read())['app']['secret_key']
     app.debug = True
-    app.run(host='localhost', port=5002)
+    app.run(host='localhost', port=5000)

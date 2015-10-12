@@ -16,6 +16,12 @@
     {% endif %}
 {% endwith %}
 
+{% if logged_in==True %}
+   <a href="{{url_for('oauth_api.disconnect')}}" class ="logout">logout</a>
+{% else %}
+   <a href="{{url_for('oauth_api.showLogin')}}" class ="login">login</a>
+{% endif %}
+
 {% if data %}
     <ul>
         {% for category_title, classes in data %}
@@ -28,7 +34,7 @@
         {% endfor %}
     </ul>
 {% endif %}
-<a href="{{url_for('new_class')}}">Add new class</a>
+<a href="{{url_for('new_class')}}" class="add">Add new class</a>
 
 </body>
 </html>

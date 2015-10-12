@@ -1,6 +1,36 @@
+body{
+    background-color: #111;
+    color: #AAA;
+    font-family: helvetica;
+}
+
+h2{
+    color:#FFF;
+}
+
+b{
+    color:#FFF;
+}
+
+a.add, a.login{
+    color:#9E9;
+}
+
+a.edit{
+    color:#EE9;
+}
+
+a.delete, a.logout{
+    color:#E99;
+}
+
+
+
+
 li.flash{
     list-style-type: none;
     background-color:cyan;
+    color:black;
 }
 
 label,input,textarea{

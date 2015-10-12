@@ -4,7 +4,9 @@ An application that provides a list of items within a variety of categories as w
 ## Usage
 ### Dependencies
 *Flask* (tested with version 0.10.1)  
-*Sqlalchemy* (tested with version 1.0.8)
+*Sqlalchemy* (tested with version 1.0.8)  
+*oauth2client* (tested with version 1.5.1)  
+*requests* (tested with version 2.8.0)
 
 ### Setup
 Rename *"private_example_files"* folder to *"private"* and edit *secrets.json* as follows:  
