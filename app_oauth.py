@@ -15,8 +15,12 @@ from database_setup import Base, User
 
 oauth_api = Blueprint('oauth_api', __name__)
 
-CLIENT_ID = json.loads(
+GOOGLE_CLIENT_ID = json.loads(
     open('private/google_client_secret.json', 'r').read())['web']['client_id']
+
+FACEBOOK_APP_ID= \
+    json.loads(open('private/fb_client_secrets.json', 'r').read())['web'][
+        'app_id']
 
 # Connect to Database and create database session
 engine = create_engine('sqlite:///catalog.db')
@@ -69,7 +73,10 @@ def login():
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for _ in xrange(32))
     login_session['state'] = state
-    return render_template('login.html', STATE=state)
+
+    return render_template('login.html', STATE=state,
+                           google_client_id=GOOGLE_CLIENT_ID,
+                           facebook_appID=FACEBOOK_APP_ID)
 
 
 # Connect using google as an oauth provider
@@ -115,7 +122,7 @@ def gconnect():
         return response
 
     # Verify that the access token is valid for this app.
-    if result['issued_to'] != CLIENT_ID:
+    if result['issued_to'] != GOOGLE_CLIENT_ID:
         response = make_response(
             json.dumps("Token's client ID does not match app's."), 401)
         print "Token's client ID does not match app's."
@@ -222,19 +229,16 @@ def fbconnect():
     access_token = request.data
     print "access token received %s " % access_token
 
-    app_id = \
-        json.loads(open('private/fb_client_secrets.json', 'r').read())['web'][
-            'app_id']
-    app_secret = \
-        json.loads(open('private/fb_client_secrets.json', 'r').read())['web'][
-            'app_secret']
+    facebook_app_secret= \
+    json.loads(open('private/fb_client_secrets.json', 'r').read())['web'][
+        'app_secret']
     url = 'https://graph.facebook.com/oauth/access_token?' \
           'grant_type=fb_exchange_token&client_id=%s&client_secret=%s&' \
-          'fb_exchange_token=%s' % (app_id, app_secret, access_token)
+          'fb_exchange_token=%s' % (FACEBOOK_APP_ID, facebook_app_secret, access_token)
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
 
-    # print "app secret",app_secret
+    # print "app secret",facebook_app_secret
     # print "result", result
 
     # Use token to get user info from API
