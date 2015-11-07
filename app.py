@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, \
     url_for, flash, Response
+from functools import wraps
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from database_setup import Base, Category, Class
@@ -17,6 +18,7 @@ ALLOWED_EXTENSIONS = {'jpg', 'jpeg', 'png'}
 app = Flask(__name__)
 app.debug = False
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 2 * 1024 * 1024
 
 app.register_blueprint(app_oauth.oauth_api, url_prefix='/oauth')
 
@@ -31,6 +33,17 @@ session = DBSession()
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+# Decorator for views requiring login.
+# Wrapped functions must take **kwargs to accept user_id value
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user_id' not in app_oauth.login_session:
+            return redirect(url_for('oauth_api.login'))
+        kwargs['user_id'] = app_oauth.login_session['user_id']
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 # HTML VIEWS
@@ -62,10 +75,9 @@ def show_all():
 # GET method: Form for registered user to add a new class
 # POST method: Accepts submitted data and saves to database
 @app.route('/new_class/', methods=['GET', 'POST'])
-def new_class():
-    if 'user_id' not in app_oauth.login_session:
-        return redirect(url_for('oauth_api.login'))
-    user_id = app_oauth.login_session['user_id']
+@login_required
+def new_class(**kwargs):
+    user_id = kwargs['user_id']
 
     # Validate state token (Anti Forgery State Token)
     invalid_response = app_oauth.validate_token(request.args.get('state'))
@@ -119,10 +131,9 @@ def new_class():
 # POST method: Deletes selected class
 # and also category if it no longer contains any classes
 @app.route('/delete_class/<int:id>/', methods=['GET', 'POST'])
-def delete_class(id):
-    if 'user_id' not in app_oauth.login_session:
-        return redirect(url_for('oauth_api.login'))
-    user_id = app_oauth.login_session['user_id']
+@login_required
+def delete_class(id, **kwargs):
+    user_id = kwargs['user_id']
 
     # Validate state token (Anti Forgery State Token)
     invalid_response = app_oauth.validate_token(request.args.get('state'))
@@ -169,10 +180,9 @@ def delete_class(id):
 # GET method: Form for registered user to edit a class (that they added)
 # POST method: Accepts submitted data and saves to database
 @app.route('/edit_class/<int:id>/', methods=['GET', 'POST'])
-def edit_class(id):
-    if 'user_id' not in app_oauth.login_session:
-        return redirect(url_for('oauth_api.login'))
-    user_id = app_oauth.login_session['user_id']
+@login_required
+def edit_class(id, **kwargs):
+    user_id = kwargs['user_id']
 
     # Validate state token (Anti Forgery State Token)
     invalid_response = app_oauth.validate_token(request.args.get('state'))
