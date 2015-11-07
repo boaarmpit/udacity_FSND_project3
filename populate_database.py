@@ -9,6 +9,7 @@ Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
 
+# Add sample data to database
 with open('sample_data.csv', 'rb') as csvfile:
     csv_reader = csv.reader(csvfile, delimiter=',', quotechar='"',
                             skipinitialspace=True)

@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 Base = declarative_base()
 
-
+# Define 'user' class to keep track of users logged in with OAuth
 class User(Base):
     __tablename__ = 'user'
 
@@ -16,14 +16,14 @@ class User(Base):
     picture = Column(String(250))
     points = Column(Integer)
 
-
+# Define 'category' class to categorize university classes in database
 class Category(Base):
     __tablename__ = 'category'
 
     id = Column(Integer, primary_key=True)
     title = Column(String(250), nullable=False)
 
-
+# Define 'class' class for university classes to be stored in database
 class Class(Base):
     __tablename__ = 'class'
 
@@ -41,7 +41,8 @@ class Class(Base):
 
     @property
     def serialize(self):
-        """Return object data in easily serializeable format"""
+        """Return object data in easily serializeable format
+        for json endpoint"""
         return OrderedDict([
             ('id', self.id),
             ('title', self.title),
